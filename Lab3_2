@@ -1,0 +1,35 @@
+#include <iostream>
+
+using namespace std;
+
+int getSize (char *string) {
+    int i = 0;
+    while (string[i] != '\0') i++;
+    return i;
+}
+
+char* maxWord (char *str) {
+    int pos = 0, wrdlen = 0, wrdlenMax = 0, len = getSize(str);
+    for (int i = 0; i < len; i++) {
+        if ((str[i] != ' ') and (str[i] >= 'A') and (str[i] <= 'z')) wrdlen++;
+        if ((str[i] == ' ') or (len - i == 1) or (str[i] < 'A') or (str[i]) > 'z') {
+            if (wrdlen > wrdlenMax) {
+                pos = i - wrdlen;
+                wrdlenMax = wrdlen;
+            }
+            wrdlen = 0;
+        }
+    }
+    char *maxWord = (char*) calloc(wrdlenMax, sizeof(char));
+    for (int i = 0; i < wrdlenMax; i++) maxWord[i] = str[i + pos];
+    return maxWord;
+}
+
+int main() {
+    char str[100];
+    cout << "Enter the string: " << endl;
+    cin.getline(str, 100);
+    cout << "String: " << str << endl;
+    cout << "The longest word: " << maxWord(str);
+    return 0;
+}

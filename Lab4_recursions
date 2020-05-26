@@ -1,0 +1,69 @@
+#include <iostream>
+
+using namespace std;
+
+int findF(int i);
+int findG(int i);
+
+double recFindMidVal(int* mas, int n, double sum, int curr) {
+    sum += mas[curr];
+    if (curr == 0) return sum/n;
+    return recFindMidVal(mas, n, sum, --curr);
+}
+
+void swap (int *a, int *b) {
+    int temp;
+    temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int recSum (int a, int b) {
+    if (b > a) swap(a,b);
+    if (b == 0) return a;
+    recSum(++a, --b);
+}
+
+int findF(int i) {
+    if (i == 1) return 1;
+    return findF(i - 1) - findG(i - 1);
+}
+
+int findG(int i) {
+    if (i == 1) return 1;
+    return findF(i - 1) + findG(i - 1);
+}
+
+int main() {
+    int userChoice;
+    cout << "Choose the task:";
+    cin >> userChoice;
+    if (userChoice == 1) {
+        int n;
+        cout << "Enter the size of massive:";
+        cin >> n;
+        int mas[n];
+        cout << "Massive: ";
+        for (int i = 0; i < n; i++) {
+            mas[i] = rand() % 100;
+            cout << mas[i] << " ";
+        }
+        cout << endl;
+        double sum = 0;
+        cout << "Mid value: " << " " << recFindMidVal(mas, n, sum, n - 1);
+        return 0;
+    }
+    if (userChoice == 2) {
+        int a,b;
+        cout << "Enter the numbers:";
+        cin >> a >> b;
+        cout << "Sum: " << recSum(a, b);
+        return 0;
+    }
+    if (userChoice == 3) {
+      for (int i = 1; i <= 10; i++)
+          cout << "F(" << i << "): " << findF(i) << "   " << "G(" << i << "): " << findG(i) << endl;
+    }
+    else cout << "Please, enter correct number.";
+    return 0;
+}

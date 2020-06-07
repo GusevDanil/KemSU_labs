@@ -1,0 +1,49 @@
+#include <iostream>
+#include <fstream>
+#include <string.h>
+#include <vector>
+
+using namespace std;
+
+void inputCheck (ifstream &file) {
+    if (!file) {
+        cout << "Error: file can't be opened";
+        exit(1);
+    }
+}
+
+struct plane {
+    int num;
+    string name;
+    string place;
+    int time;
+};
+
+void show(plane tic) {
+    cout << "Number: " << tic.num << endl;
+    cout << "Name: " << tic.name << endl;
+    cout << "Place: " << tic.place << endl;
+    cout << "Time: " << tic.time << " min." << endl;
+}
+
+plane makeTics (ifstream &file) {
+    plane ticket;
+    string temp;
+    file.getline(file, ticket.num)
+    if (!getline(file, temp)) return ticket;
+}
+
+int main() {
+    ifstream data("C:\\Users\\V1P3R\\lab5_struct\\data");
+    inputCheck(data);
+    int i = 0;
+    vector <plane> allTickets;
+    while (!data.eof()) {
+        allTickets.at(i) = makeTics(data);
+        i++;
+    }
+    int ticsAm = i;
+    for (int i = 0; i < ticsAm; i++) show(allTickets[i]);
+    data.close();
+    return 0;
+}

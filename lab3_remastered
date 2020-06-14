@@ -1,0 +1,100 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int getSize (char *str) {
+    int i = 0;
+    while (str[i] != '\0') i++;
+    return i;
+}
+
+char* copy (char *str) {
+    char *newStr = (char*) calloc(getSize(str) + 1, sizeof(char));
+    for (int i = 0; i <= getSize(str); i++) newStr[i] = str[i];
+    return newStr;
+}
+
+void inputCheck (ifstream &file) {
+    if (!file) {
+        cout << "Error: file can't be opened";
+        exit(1);
+    }
+}
+
+char* minWrd (char *str) {
+    int strLen = getSize(str), wrdLen = 0, pos = 0, wrdLenMin = 9999;
+    for (int i = 0; i < strLen; i++) {
+        if ((str[i] >= 'A') and (str[i] <= 'z')) wrdLen++;
+        else {
+            if (wrdLen < wrdLenMin) {
+                pos = i - wrdLen;
+                wrdLenMin = wrdLen;
+            }
+            wrdLen = 0;
+        }
+    }
+    char *minWrd = (char*) calloc (wrdLenMin + 1, sizeof(char));
+    for (int i = 0; i <= wrdLenMin; i++) minWrd[i] = str[i + pos];
+    return minWrd;
+}
+
+void bubbleSort (char (&text)[3][100], int size) {
+    size--;
+    bool exit = false;
+    while (!exit) {
+        exit = true;
+        for (int i = 0; i < size; i++) {
+            if (getSize(text[i]) < getSize(text[i + 1])) {
+                swap(text[i], text[i + 1]);
+                exit = false;
+            }
+        }
+    }
+}
+
+int main() {
+    int userChoice;
+    cout << "Choose the task:";
+    cin >> userChoice;
+    if (userChoice == 1) {
+        char str[100];
+        cout << "Enter the string:";
+        cin.get();
+        cin.getline(str, 100);
+        cout << "Your string: " << str << endl;
+        char *newStr = copy(str);
+        cout << "Copy of your string: " << newStr << endl;
+        return 0;
+    }
+    if (userChoice == 2) {
+        ifstream text("C:\\Users\\V1P3R\\lab_3_strings\\test");
+        inputCheck(text);
+        char str1[100];
+        text.getline(str1, 100);
+        text.close();
+        cout << "The first string of the text: " << str1 << endl;
+        cout << "The shortest word of the string: " << minWrd(str1);
+        return 0;
+    }
+    if (userChoice == 3) {
+        ifstream text("C:\\Users\\V1P3R\\lab_3_strings\\test");
+        inputCheck(text);
+        char masStr[3][100];
+        int i = 0;
+        while (!text.eof()) {
+            text.getline(masStr[i], 100);
+            i++;
+        }
+        text.close();
+        cout << "Sample text:" << endl;
+        for (int j = 0; j < i; j++) cout << masStr[j] << endl;
+        cout << endl;
+        bubbleSort(masStr, i);
+        cout << "Sorted text:" << endl;
+        for (int j = 0; j < i; j++) cout << masStr[j] << endl;
+        return 0;
+    }
+    else cout << "Please, enter correct number.";
+    return 1;
+}

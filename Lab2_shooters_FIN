@@ -1,0 +1,89 @@
+#include <iostream>
+
+using namespace std;
+
+int** createTable(int n, int m) {
+    int **table = new int *[n];
+    for (int i = 0; i < n; i++) {
+        table[i] = new int[m];
+    }
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++)
+           cin >> table[i][j];
+    }
+    return table;
+}
+
+void showTable (int** table, int n, int m) {
+    cout << "Score table: " << endl;
+    int score;
+    for (int i = 0; i < n; i++) {
+        score = 0;
+        cout << "Shooter " << i + 1 << ": ";
+        for (int j = 0; j < m; j++) {
+            score += table[i][j];
+            cout << table[i][j] << " ";
+            if (j == m - 1) cout << " Total score: " << score << endl;
+        }
+    }
+}
+
+void findWinner (int **table, int n, int m) {
+    int *wnrs = (int *) calloc(n, sizeof(int));
+    int winners, bestShooter, bestScore;
+    int bestShoot = -1;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (table[i][j] > bestShoot) {
+                bestShoot = table[i][j];
+                bestShooter = i;
+                winners = 1;
+                bestScore = 0;
+                for (int j = 0; j < m; j++) bestScore += table[bestShooter][j];
+            }
+            if (table[i][j] == bestShoot) {
+                if (i == bestShooter) continue;
+                int score = 0;
+                for (int j = 0; j < m; j++) score += table[i][j];
+                if (score == bestScore) {
+                    winners++;
+                    wnrs[0] = bestShooter;
+                    wnrs[winners - 1] = i;
+                }
+                if (score > bestScore) {
+                    winners = 1;
+                    bestShooter = i;
+                    bestScore = score;
+                }
+            }
+        }
+    }
+    if (winners > 1) {
+        cout << "Winners - Shooters ";
+        for (int i = 0; i < winners; i++) cout << wnrs[i] + 1 << " ";
+    }
+    else cout << "Winner - Shooter " << bestShooter + 1;
+    free(wnrs);
+}
+
+void freeMem (int **mas, int n) {
+    for(int i = 0; i < n; i++) delete[] mas[i];
+    delete[] mas;
+}
+
+int main() {
+    unsigned int n, m;
+    cout << "Amount of shooters:";
+    cin >> n;
+    cout << "Amount of shoots:";
+    cin >> m;
+    if (n == 0 or m == 0) {
+        cout << "Incorrect input";
+        return 1;
+    }
+    int **table = createTable(n, m);
+    showTable(table, n, m);
+    findWinner(table, n, m);
+    freeMem(table, n);
+    return 0;
+}

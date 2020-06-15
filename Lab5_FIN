@@ -1,0 +1,159 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+
+using namespace std;
+
+struct ticket {
+    int num = 0;
+    string name;
+    string place;
+    int time = 0;
+};
+
+void inputCheck (ifstream &data);
+int structCounter (ifstream &data);
+ticket* ticsTable (ifstream &data);
+void tokenizer (char *temp, ticket *allTics, int i);
+void show (ticket tic);
+void findSurname (ticket *allTics, int cntr);
+void findLongestTrips (ticket *allTics, int cntr);
+void bubbleSort (ticket *allTics, int* longWays, int longFliesCntr);
+
+void inputCheck (ifstream &data) {
+    if (!data) {
+        cout << "Error: file can't be opened";
+        exit(1);
+    }
+}
+
+int structCounter (ifstream &data) {
+    int cntr = 0;
+    char *temp = new char [1024];
+    while (!data.eof()) {
+        data.getline(temp, 1024, '\n');
+        if (temp[0] != '\0') cntr++;
+    }
+    delete[] temp;
+    data.clear();
+    data.seekg(0);
+    return cntr;
+}
+
+ticket* ticsTable (ifstream &data) {
+    ticket *allTics = new ticket [structCounter(data)];
+    char *temp = new char [1024];
+    int i = 0;
+    while (!data.eof()) {
+        data.getline(temp, 1024, '\n');
+        if (temp[0] == '\0') continue;
+        tokenizer(temp, allTics, i);
+        i++;
+    }
+    delete[] temp;
+    return allTics;
+}
+
+void tokenizer (char *temp, ticket *allTics, int i) {
+    int breakCntr = 0;
+    for (int j = 0; j < strlen(temp); j++) {
+        if (temp[j] == '/') {
+            breakCntr++;
+            continue;
+        }
+        switch (breakCntr) {
+            case 0:
+                allTics[i].num *= 10;
+                allTics[i].num += temp[j] - '0';
+                break;
+            case 1:
+                allTics[i].name += temp[j];
+                break;
+            case 2:
+                allTics[i].place += temp[j];
+                break;
+            case 3:
+                allTics[i].time *= 10;
+                allTics[i].time += temp[j] - '0';
+                break;
+            default:
+                return;
+        }
+    }
+}
+
+void show (ticket tic) {
+    cout << "Number: " << tic.num << endl;
+    cout << "Name: " << tic.name << endl;
+    cout << "Place: " << tic.place << endl;
+    cout << "Time: " << tic.time / 60 << "h " << tic.time % 60 << " min" << endl;
+    cout << endl;
+}
+
+void findSurname (ticket *allTics, int cntr) {
+    string surname;
+    cout << "Enter the surname what you want to find out:";
+    cin >> surname;
+    cout << surname << "'s tics:" << endl << endl;
+    bool fail = true;
+    for (int i = 0; i < cntr; i++) {
+        int match = 0;
+        if (strlen(allTics[i].name.c_str()) - strlen(surname.c_str()) < 6) {
+            for (int j = 0; j < strlen(allTics[i].name.c_str()); j++)
+                if (surname[j] == allTics[i].name[j]) match++;
+        }
+        if (match == strlen(surname.c_str())) {
+            show(allTics[i]);
+            fail = false;
+        }
+    }
+    if (fail) cout << "Where's no " << surname << "'s in the list";
+}
+
+void findLongestTrips (ticket *allTics, int cntr) {
+    int prolongation;
+    cout << "You want to find the flights what longer than... (in minutes):";
+    cin >> prolongation;
+    int longFliesCntr = 0;
+    for (int i = 0; i < cntr; i++) if (allTics[i].time > prolongation) longFliesCntr++;
+    int *longWays = (int*) calloc (longFliesCntr, sizeof(int));
+    int j = 0;
+    for (int i = 0; i < cntr; i++) {
+        if (allTics[i].time > prolongation) {
+            longWays[j] = i;
+            j++;
+        }
+    }
+    bubbleSort(allTics, longWays, longFliesCntr);
+    cout << "This guys could be last:" << endl << endl;
+    for (int i = 0; i < longFliesCntr; i++) show(allTics[longWays[i]]);
+    free(longWays);
+}
+
+void bubbleSort (ticket *allTics, int* longWays, int longFliesCntr) {
+    longFliesCntr--;
+    bool exit = false;
+    while (!exit) {
+        exit = true;
+        for (int i = 0; i < longFliesCntr; i++) {
+            if (strcmp(allTics[longWays[i]].name.c_str(), allTics[longWays[i + 1]].name.c_str()) > 0) {
+                swap(longWays[i], longWays[i + 1]);
+                exit = false;
+            }
+        }
+    }
+}
+
+int main() {
+    ifstream data("C:\\Users\\V1P3R\\lab5_struct\\data");
+    inputCheck(data);
+    int cntr = structCounter(data);
+    ticket *Tics = ticsTable(data);
+    data.close();
+    cout << "All tickets:" << endl << endl;
+    for (int i = 0; i < cntr; i++) show(Tics[i]);
+    findSurname(Tics, cntr);
+    findLongestTrips(Tics, cntr);
+    delete[] Tics;
+    return 0;
+}

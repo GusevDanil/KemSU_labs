@@ -1,0 +1,105 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+void inputCheck (ifstream &file) {
+    if (!file) {
+        cout << "File can't be opened";
+        exit(1);
+    }
+}
+
+int *masInit (ifstream &file, int cntr) {
+    file.clear();
+    file.seekg(0);
+    int *mas = (int*) calloc (cntr, sizeof(int));
+    int a;
+    int i = 0;
+    while (!file.eof()) {
+        file >> a;
+        if (a < 0) {
+            mas[i] = a;
+            i++;
+        }
+    }
+    return mas;
+}
+
+void bubbleSort (int *mas, int size) {
+    size--;
+    bool exit = false;
+    while (!exit) {
+        exit = true;
+        for (int i = 0; i < size; i++) {
+            if (mas[i] < mas[i + 1]) {
+                swap(mas[i], mas[i + 1]);
+                exit = false;
+            }
+        }
+    }
+}
+
+int *compressing (int *mas, int cntr, int size) {
+    int *comp = (int*) calloc (cntr, sizeof(int));
+    int j = 0;
+    for (int i = 0; i < size; i++) {
+        if (mas[i] % 2) {
+            comp[j] = mas[i];
+            j++;
+        }
+    }
+    return comp;
+}
+
+int main() {
+    int userChoice;
+    cout << "Enter the number of the task:";
+    cin >> userChoice;
+    if (userChoice == 1) {
+        ifstream file ("C:\\Users\\V1P3R\\lab1\\test");
+        inputCheck(file);
+        int a;
+        int cntr = 0;
+        cout << "File: ";
+        while (!file.eof()) {
+            file >> a;
+            cout << a << " ";
+            if (a < 0) cntr++;
+        }
+        cout << endl;
+        int *mas = masInit(file, cntr);
+        file.close();
+        cout << "Negative numbers: ";
+        for (int i = 0; i < cntr; i++) cout << mas[i] << " ";
+        cout << endl;
+        bubbleSort(mas, cntr);
+        cout << "Sorted: ";
+        for (int i = 0; i < cntr; i++) cout << mas[i] << " ";
+        free(mas);
+        return 0;
+    }
+    if (userChoice == 2) {
+        int size, a, b;
+        int cntr = 0;
+        cout << "Enter the size of massive:";
+        cin >> size;
+        cout << "Enter borders of range:";
+        cin >> a >> b;
+        cout << "Your massive: ";
+        int *mas = (int*) calloc (size, sizeof(int));
+        for (int i = 0; i < size; i++) {
+            mas[i] = a + rand() % b;
+            cout << mas[i] << " ";
+            if (mas[i] % 2) cntr++;
+        }
+        cout << endl;
+        int *comp = compressing(mas, cntr, size);
+        free(mas);
+        cout << "Compressed: ";
+        for (int i = 0; i < cntr; i++) cout << comp[i] << " ";
+        free(comp);
+        return 0;
+    }
+    else cout << "Please, enter correct number";
+    return 0;

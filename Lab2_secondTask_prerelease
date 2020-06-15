@@ -1,0 +1,115 @@
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+void makeFile(int n, int m) {
+    int i = 0;
+    ofstream file ("C:\\Users\\V1P3R\\lab2_secondtask\\test");
+    while (i < 2*m + 2*m*n) {
+        int a = -30 + rand() % 100;
+        file << a << endl;
+        i++;
+    }
+    file.close();
+}
+
+int** initMatrix (ifstream &file, int n, int m) {
+        int **matrix = new int* [n];
+        for (int i = 0; i < n; i++) matrix[i] = new int [m];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < m; j++) file >> matrix[i][j];
+        return matrix;
+}
+
+void showMatrix (int **matrix, int n, int m) {
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++) {
+            cout << matrix[i][j] << " ";
+            if (j == m - 1) cout << endl;
+        }
+    cout << endl;
+}
+
+void freeMem (int **matrix, int n) {
+    for (int i = 0; i < n; i++) delete[] matrix[i];
+    delete[] matrix;
+}
+
+int** transporating (int **matrix, int m, int n) {
+    int **transporated = new int* [n];
+    for (int i = 0; i < n; i++) transporated[i] = new int [m];
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            transporated[j][i] = matrix[i][j];
+    return transporated;
+}
+
+int** mult (int **matrix, int **vector, int n, int m) {
+    int **resVec = new int* [n];
+    for (int i = 0; i < n; i++) resVec[i] = new int [0];
+    for (int i = 0; i < n; i++) resVec[i][0] = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            resVec[i][0] += matrix[i][j] * vector[j][0];
+    return resVec;
+}
+
+void **multByInt (int **matrix, int n, int m, int mul) {
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            matrix[i][j] *= mul;
+}
+
+void substruction (int **vecA, int **vecB, int n) {
+    int *answer = (int*) calloc(n, sizeof(int));
+    for (int i = 0; i < n; i++) {
+        answer[i] = vecA[i][0] - vecB[i][0];
+        cout << answer[i] << endl;
+    }
+    free(answer);
+}
+
+int main() {
+    int n, m;
+    cout << "Enter the sizes of matrixes and vectors: ";
+    cin >> n >> m;
+    makeFile (n, m);
+    ifstream file ("C:\\Users\\V1P3R\\lab2_secondtask\\test");
+    int **a = initMatrix (file, m, n);
+    int **b = initMatrix (file, m, 1);
+    int **c = initMatrix (file, n, m);
+    int **d = initMatrix (file, m, 1);
+    file.close();
+    cout << "Matrix A:" << endl;
+    showMatrix(a, m, n);
+    cout << "Vector B:" << endl;
+    showMatrix(b, m, 1);
+    cout << "Matrix C:" << endl;
+    showMatrix(c, n, m);
+    cout << "Vector D:" << endl;
+    showMatrix(d, m, 1);
+    cout << "Expression: At * B - 10C * D" << endl << endl;
+    int **aT = transporating(a, m, n);
+    freeMem(a, m);
+    cout << "1) Transporated A:" << endl;
+    showMatrix(aT, n, m);
+    int **aTBMult = mult(aT, b, n, m);
+    freeMem(aT, n);
+    freeMem(b, m);
+    cout << "2) At and B multipliaction (result vector):" << endl;
+    showMatrix(aTBMult, n, 1);
+    multByInt(c, n, m, 10);
+    cout << "3) C multiplicated by 10:" << endl;
+    showMatrix(c, n, m);
+    int **cDMult = mult(c, d, n, m);
+    freeMem(c, n);
+    freeMem(d, m);
+    cout << "4) C and D multipliaction (result vector):" << endl;
+    showMatrix(cDMult, n, 1);
+    cout << "5) Here's the answer:" << endl;
+    substruction(aTBMult, cDMult, n);
+    freeMem(aTBMult, m);
+    freeMem(cDMult, m);
+    return 0;
+}

@@ -1,0 +1,77 @@
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+
+using namespace std;
+
+
+int **initMatrix (int s, int a, int b) {
+    int **matrix = new int *[s];
+    for (int i = 0; i < s; i++) matrix[i] = new int [s];
+    srand (time(NULL));
+    for (int i = 0; i < s; i++)
+        for (int j = 0; j < s; j++)
+            matrix[i][j] = a + rand() % b + 1;
+    return matrix;
+}
+
+void showMatrix (int** matrix, int s) {
+    for (int i = 0; i < s; i++) {
+        for (int j = 0; j < s; j++) {
+            cout << matrix[i][j] << " ";
+            if (j == s - 1) cout << endl;
+        }
+    }
+}
+
+void analysis (int ** matrix, int s, int a, int b) {
+    int maxNeg = a - 1;
+    int minPos = b + 1;
+    int negI, negJ, posI, posJ;
+    for (int i = 0; i < s; i++) {
+        for (int j = 0; j < s; j++) {
+            if (j > i && i + j < s - 1) {
+                if (matrix[i][j] > 0 && matrix[i][j] < minPos) {
+                    minPos = matrix[i][j];
+                    posI = i;
+                    posJ = j;
+                }
+            }
+            if (j < i  && i + j > s - 1) {
+                if (matrix[i][j] < 0 && matrix[i][j] > maxNeg) {
+                    maxNeg = matrix[i][j];
+                    negI = i;
+                    negJ = j;
+                }
+            }
+        }
+    }
+    if (minPos == b + 1 || maxNeg == a - 1) {
+        cout << "Max negative or min positive didnt exist in this sectors of matrix";
+        exit(1);
+    }
+    cout << "Max negative: " << "[" << negI << "]" << "[" << negJ << "]" << " " << maxNeg << endl;
+    cout << "Min positive: " << "[" << posI << "]" << "[" << posJ << "]" << " " <<  minPos << endl;
+    swap(matrix[negI][negJ], matrix[posI][posJ]);
+}
+
+int main() {
+    unsigned int s;
+    int a, b;
+    cout << "Enter size of matrix:";
+    cin >> s;
+    if (s < 2) {
+        cout << "Incorrect size";
+        return 1;
+    }
+    cout << "Enter the borders of numeric segment:";
+    cin >> a >> b;
+    int **matrix = initMatrix(s, a, b);
+    cout << "Your matrix: " << endl;
+    showMatrix(matrix, s);
+    analysis(matrix, s, a, b);
+    cout << "Swapped: " << endl;
+    showMatrix(matrix, s);
+    free(matrix);
+    return 0;
+}
